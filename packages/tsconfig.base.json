@@ -1,0 +1,17 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+      "declaration": true,
+      "target": "es2016",
+      "strict": true,
+      "esModuleInterop": true,
+      "inlineSourceMap": true,
+      "declarationMap": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "module": "commonjs",
+      "noEmit": false,
+      "composite": true
+    },
+    "files": []
+  }

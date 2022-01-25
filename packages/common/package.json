@@ -1,0 +1,19 @@
+{
+    "name": "@klaytn-graph/common",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "files": [
+      "dist"
+    ],
+    "license": "MIT",
+    "author": "Narendra Soni",
+    "private": true,
+    "scripts": {
+      "build": "run-s clean build:tsc",
+      "build:tsc": "tsc -b",
+      "clean": "rimraf dist coverage tsconfig.tsbuildinfo"
+    },
+    "devDependencies": {
+      "ts-node": "^10.4.0"
+    }
+  }

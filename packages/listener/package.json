@@ -1,0 +1,26 @@
+{
+  "name": "@klaytn-graph/listener",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "author": "Narendra Soni",
+  "private": true,
+  "scripts": {
+    "build": "run-s clean build:tsc",
+    "build:tsc": "tsc -b",
+    "clean": "rimraf dist coverage tsconfig.tsbuildinfo",
+    "start": "node dist/index.js",
+    "start:dev": "nodemon"
+  },
+  "dependencies": {
+    "@klaytn-graph/common": "^1.0.0",
+    "dotenv": "^14.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.4.0"
+  }
+}
