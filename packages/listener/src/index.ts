@@ -150,7 +150,6 @@ const testNFTMint = async (blockNum: Number) => {
         await testNFTMint(blockNum);
 
         // console.log(version)
-
     } catch (error) {
         console.log(`Error encountered : ${error}`)
     }
