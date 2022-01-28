@@ -1,19 +1,24 @@
 {
-    "name": "@klaytn-graph/common",
-    "version": "1.0.0",
-    "main": "dist/index.js",
-    "files": [
-      "dist"
-    ],
-    "license": "MIT",
-    "author": "Narendra Soni",
-    "private": true,
-    "scripts": {
-      "build": "run-s clean build:tsc",
-      "build:tsc": "tsc -b",
-      "clean": "rimraf dist coverage tsconfig.tsbuildinfo"
-    },
-    "devDependencies": {
-      "ts-node": "^10.4.0"
-    }
+  "name": "@klaytn-graph/common",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "author": "Narendra Soni",
+  "private": true,
+  "scripts": {
+    "build": "run-s clean build:tsc",
+    "build:tsc": "tsc -b",
+    "clean": "rimraf dist coverage tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "debug": "^4.3.3",
+    "dotenv": "^14.3.2",
+    "knex": "^1.0.1",
+    "pg": "^8.7.1",
+    "winston": "^3.5.0",
+    "winston-daily-rotate-file": "^4.6.0"
   }
+}

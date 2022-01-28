@@ -110,6 +110,3 @@ dist
 
 # Package lock file
 package-lock.json 
-
-# Local data folder from MongoDB with docker-compose.yml
-data

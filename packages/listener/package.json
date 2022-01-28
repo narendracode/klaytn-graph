@@ -13,18 +13,13 @@
     "build:tsc": "tsc -b",
     "clean": "rimraf dist coverage tsconfig.tsbuildinfo",
     "start": "node dist/index.js",
-    "start:dev": "nodemon",
-    "migrate": "knex migrate:latest",
-    "unmigrate": "knex migrate:rollback",
-    "seed": "knex seed:run "
+    "start:dev": "nodemon"
   },
   "dependencies": {
     "@klaytn-graph/common": "^1.0.0",
     "caver-js": "^1.6.8-rc.1",
     "debug": "^4.3.3",
     "dotenv": "^14.3.0",
-    "knex": "^1.0.1",
-    "pg": "^8.7.1",
     "winston": "^3.5.0",
     "winston-daily-rotate-file": "^4.6.0"
   },

@@ -17,7 +17,10 @@
   },
   "dependencies": {
     "@klaytn-graph/common": "^1.0.0",
-    "dotenv": "^14.3.0"
+    "debug": "^4.3.3",
+    "dotenv": "^14.3.0",
+    "winston": "^3.5.0",
+    "winston-daily-rotate-file": "^4.6.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
