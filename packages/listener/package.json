@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@klaytn-graph/common": "^1.0.0",
+    "caver-js": "^1.6.8-rc.1",
     "dotenv": "^14.3.0"
   },
   "devDependencies": {
