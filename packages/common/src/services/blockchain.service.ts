@@ -6,13 +6,18 @@ export class BlockchainService {
 
     constructor(networkUri: string) {
         this.caver = new Caver(networkUri);
-        // const caver = new Caver('https://api.baobab.klaytn.net:8651/');
+        // this.caver = new Caver('https://api.baobab.klaytn.net:8651/');
     }
 
     useKey = (privateKey: string) => {
         const senderAddress = this.caver.klay.accounts.wallet.add(privateKey).address
         this.caver.wallet.add(this.caver.wallet.keyring.createFromPrivateKey(privateKey))
         this.sender = senderAddress;
+    }
+
+    getCurrentNetworkBlock = async () => {
+        let currNetworkBlock = await this.caver.klay.getBlock("latest");
+        return this.caver.utils.hexToNumber(currNetworkBlock.number)
     }
 
     deployKP17 = async (name: string, symbol: string) => {
