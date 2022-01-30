@@ -1,8 +1,8 @@
 import * as klaytnGraph from '@klaytn-graph/common'
-import Caver, { Wallet } from 'caver-js';
+import { ContractType } from '@klaytn-graph/common/src/dtos/contract.dto';
+import Caver, { TransactionReceipt } from 'caver-js';
 import { interfaceIds } from './util'
-import { ContractType, SearchContractDto } from '@klaytn-graph/common/src/dtos/contract.dto';
-
+const klaytnSrvc = new klaytnGraph.commons.klaytnService("https://api.baobab.klaytn.net:8651/");
 const caver = new Caver('https://api.baobab.klaytn.net:8651/');
 const senderPrvKey = "";
 
@@ -129,6 +129,116 @@ const testNFTMint = async (blockNum: Number) => {
     }
 }
 
+const processContractCreation = async (receipt: TransactionReceipt) => {
+    const contractAddress = receipt["contractAddress"];
+    const txHash = receipt["transactionHash"]
+
+    const senderAddress = receipt["from"]
+
+    const nftContract = new caver.contract(caver.kct.kip17.abi, contractAddress);
+    const isKP17 = await nftContract.methods.supportsInterface(interfaceIds.kip17.IKIP17).call();
+    const isIKIP17Metadata = await nftContract.methods.supportsInterface(interfaceIds.kip17.IKIP17Metadata).call();
+    const isIKIP17Enumerable = await nftContract.methods.supportsInterface(interfaceIds.kip17.IKIP17Enumerable).call();
+    const name = await nftContract.methods.name().call();
+    const symbol = await nftContract.methods.symbol().call();
+
+    if (isKP17 && isIKIP17Metadata && isIKIP17Enumerable) {
+        const contractCreationDto = {
+            contractAddress: contractAddress,
+            deployerAddress: senderAddress,
+            name: name,
+            symbol: symbol,
+            type: ContractType.NFT
+        }
+        await klaytnGraph.commons.contractService.addContract(contractCreationDto)
+    } else {
+        // just ignoring other type of contracts for now.
+    }
+}
+
+const getEvents = async (contractAddress: string, blockNum: number, txHash: string) => {
+    const kp17Contract = new caver.klay.Contract(caver.kct.kip17.abi, contractAddress)
+    const allEvents = await kp17Contract.getPastEvents('allEvents', {
+        fromBlock: blockNum,
+        toBlock: blockNum
+    })
+    const allEventsFromTxHash = allEvents.filter((event) => { return event.address?.toLowerCase() === contractAddress && event.transactionHash === txHash });
+    return allEventsFromTxHash
+}
+
+const processContractFunctionExecution = async (receipt: TransactionReceipt) => {
+    let txHash = receipt["transactionHash"]
+    let ownerAddress = receipt["from"]
+    let contractAddress = receipt["to"] ? receipt["to"].toLowerCase() : ""; //
+
+    // check if contractAddress is something which is supposed to be tracked.
+    const existingContracts = await klaytnGraph.commons.contractService.findByContractAddress(contractAddress.toLowerCase())
+    const isExistingContract = (existingContracts && existingContracts.length && existingContracts.length > 0)
+    if (isExistingContract) {
+        const blkNum = klaytnSrvc.hexToNumber(receipt["blockNumber"])
+        const allEvents = await getEvents(contractAddress, blkNum, txHash);
+        for (let index = 0; index < allEvents.length; index++) {
+            const event = allEvents[index];
+            const eventName = event.event;
+            switch (eventName) {
+                case "Transfer": {
+                    const eventValues = event.returnValues ? event.returnValues : {};
+                    const from = eventValues.from;
+                    const to = eventValues.to;
+                    const tokenId = eventValues.tokenId
+                    if (from && from.length && to && to.length && tokenId && tokenId.length) {
+                        if (from === "0x0000000000000000000000000000000000000000") {
+                            // token minted
+                            const tokenUri = await klaytnSrvc.getTokenUri(contractAddress.toLowerCase(), Number(tokenId))
+                            await klaytnGraph.commons.nftService.addNFT({
+                                contractAddress: contractAddress.toLowerCase(),
+                                ownerAddress: ownerAddress.toLowerCase(),
+                                tokenId: Number(tokenId),
+                                tokenUri: tokenUri,
+                                price: -1
+                            })
+                            console.log(`token minted with tokenId ${tokenId} in contract ${contractAddress.toLowerCase()}`)
+                        } else {
+                            // token transferred
+                            await klaytnGraph.commons.nftService.updateNFTOwner({
+                                nextOwnerAddress: to.toLowerCase(),
+                                contractAddress: contractAddress.toLowerCase(),
+                                tokenId: Number(tokenId),
+                                currentOwnerAddress: from.toLowerCase()
+                            })
+                            console.log(`token with tokenId ${tokenId} in contract ${contractAddress} transferred from ${from.toLowerCase()} to ${to.toLowerCase()}`)
+                        }
+                    }
+                    break;
+                }
+                default: {
+                    console.log(`Event ${eventName} is not in use. Ignore.`)
+                }
+            }
+        }
+    }
+}
+
+const processBlock = async (blockNum: number) => {
+    const receipts = await klaytnSrvc.getTxReceipt(blockNum)
+
+    for (let i = 0; i < receipts.length; i++) {
+        let receipt = receipts[i];
+        const status = klaytnSrvc.hexToNumber(receipt["status"])
+
+        if (status !== 1) {
+            console.log(`status for transaction is not 1.`)
+            continue;
+        }
+        // if receipt returns contract address then it is contract creation else it is function execution.
+        if (receipt["contractAddress"] !== null) {
+            // transaction is contract creation
+            await processContractCreation(receipt)
+        } else {
+            await processContractFunctionExecution(receipt)
+        }
+    }
+}
 
 (async () => {
     //setInterval(async () => {
@@ -151,6 +261,11 @@ const testNFTMint = async (blockNum: Number) => {
         //const blockNum = 81782471; //nft transfer
         //await testNFTMint(blockNum);
 
+        let currNetworkBlock = await caver.klay.getBlock("latest");
+        // console.log(`currentNetworkBlock : ${JSON.stringify(currNetworkBlock.number)}`)
+        let currentNwBlockNumber = caver.utils.hexToNumber(currNetworkBlock.number)
+        console.log(`currentNetworkBlock : ${currentNwBlockNumber}`)
+        //await processBlock(81782471)
         //let currBlock = await klaytnGraph.commons.globalBlockService.getCurrentBlock()
         //console.log(`current block : ${JSON.stringify(currBlock)}`)
 
@@ -159,17 +274,6 @@ const testNFTMint = async (blockNum: Number) => {
 
         // console.log(version)
 
-        /*
-        const contractCreateRes = await klaytnGraph.commons.contractService.addContract({
-            contractAddress: "testcontractaddress1",
-            deployerAddress: "testdeployeraddress1",
-            type: ContractType.NFT,
-            name: "dummyname1",
-            symbol: "dummysymbol1"
-        })
-        console.log(`contarct create res : ${JSON.stringify(contractCreateRes)}`)
-        */
-
         //const contracts = await klaytnGraph.commons.contractService.getAllContracts();
         //console.log(`contracts : ${JSON.stringify(contracts)}`)
 
@@ -177,30 +281,10 @@ const testNFTMint = async (blockNum: Number) => {
         //const contractFindByRes = await klaytnGraph.commons.contractService.find({ type: ContractType.NFT })
         //console.log(`contractFindByRes : ${JSON.stringify(contractFindByRes)}`)
 
-        /*
-        const createNFTRes = await klaytnGraph.commons.nftService.addNFT({
-            contractAddress: "testcontractaddress1",
-            ownerAddress: "testowneraddress1",
-            tokenId: 2,
-            tokenUri: "someipfsurl",
-            price: -1
-        })
-        console.log(`nft create res : ${JSON.stringify(createNFTRes)}`)
-        */
-
         // const nfts = await klaytnGraph.commons.nftService.getAllNFTs({ tokenId: "1" });
         //console.log(`nft : ${JSON.stringify(nfts)}`)
 
         /*
-        const updateNFTOwnerRes = await klaytnGraph.commons.nftService.updateNFTOwner({
-            nextOwnerAddress: "someTEStNextOwneraddress1",
-            contractAddress: "testcontractaddress1",
-            tokenId: 2,
-            currentOwnerAddress: "someTEStNextOwneraddress"
-        })
-        console.log(`update nft owner res : ${JSON.stringify(updateNFTOwnerRes)}`)
-        */
-
         const updateNFTPriceRes = await klaytnGraph.commons.nftService.updateNFTPrice({
             ownerAddress: "someTEStNextOwneraddress1",
             contractAddress: "testcontractaddress1",
@@ -208,6 +292,7 @@ const testNFTMint = async (blockNum: Number) => {
             price: 12
         })
         console.log(`update nft price res : ${JSON.stringify(updateNFTPriceRes)}`)
+        */
     } catch (error) {
         console.log(`Error encountered : ${error}`)
     }

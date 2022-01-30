@@ -52,4 +52,12 @@ export class BlockchainService {
         return receipts;
     }
 
+    hexToNumber = (hex: string): number => {
+        return Number(this.caver.utils.hexToNumber(hex))
+    }
+
+    getTokenUri = async (contractAddress: string, tokenId: number) => {
+        const kp17Contract = new this.caver.klay.Contract(this.caver.kct.kip17.abi, contractAddress)
+        return await kp17Contract.methods.tokenURI(tokenId).call()
+    }
 }
