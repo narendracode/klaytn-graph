@@ -1,17 +1,19 @@
-import * as common from '@klaytn-graph/common'
+import * as klaytnGraph from '@klaytn-graph/common'
 import Caver, { Wallet } from 'caver-js';
 import { interfaceIds } from './util'
+import { ContractType, SearchContractDto } from '@klaytn-graph/common/src/dtos/contract.dto';
 
 const caver = new Caver('https://api.baobab.klaytn.net:8651/');
 const senderPrvKey = "";
 
-const useKey = (privateKey: String) => {
-    const senderAddress = caver.klay.accounts.wallet.add(senderPrvKey).address
-    caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(senderPrvKey))
+
+const useKey = (privateKey: string) => {
+    const senderAddress = caver.klay.accounts.wallet.add(privateKey).address
+    caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(privateKey))
     return senderAddress;
 }
 
-const deployKP17 = async (privateKey: String) => {
+const deployKP17 = async (privateKey: string) => {
     const senderAddress = useKey(privateKey)
 
     const deployedKP17 = await caver.kct.kip17.deploy({ name: "NTest Contract", "symbol": "NCT" }, senderAddress)
@@ -146,10 +148,66 @@ const testNFTMint = async (blockNum: Number) => {
         // await testNFTMint(blockNum);
 
         //await transferToken(senderPrvKey, address, "0x7d5236c8f1199d9d072C0CCa6a9C74A0e6C8Bbe5", 1)
-        const blockNum = 81782471; //nft transfer
-        await testNFTMint(blockNum);
+        //const blockNum = 81782471; //nft transfer
+        //await testNFTMint(blockNum);
+
+        //let currBlock = await klaytnGraph.commons.globalBlockService.getCurrentBlock()
+        //console.log(`current block : ${JSON.stringify(currBlock)}`)
+
+        // await klaytnGraph.commons.globalBlockService.incrementBlock()
+        //await klaytnGraph.commons.globalBlockService.setBlock(10);
 
         // console.log(version)
+
+        /*
+        const contractCreateRes = await klaytnGraph.commons.contractService.addContract({
+            contractAddress: "testcontractaddress1",
+            deployerAddress: "testdeployeraddress1",
+            type: ContractType.NFT,
+            name: "dummyname1",
+            symbol: "dummysymbol1"
+        })
+        console.log(`contarct create res : ${JSON.stringify(contractCreateRes)}`)
+        */
+
+        //const contracts = await klaytnGraph.commons.contractService.getAllContracts();
+        //console.log(`contracts : ${JSON.stringify(contracts)}`)
+
+        //const contractFindByRes = await klaytnGraph.commons.contractService.findByContractAddress("testcontractaddress")
+        //const contractFindByRes = await klaytnGraph.commons.contractService.find({ type: ContractType.NFT })
+        //console.log(`contractFindByRes : ${JSON.stringify(contractFindByRes)}`)
+
+        /*
+        const createNFTRes = await klaytnGraph.commons.nftService.addNFT({
+            contractAddress: "testcontractaddress1",
+            ownerAddress: "testowneraddress1",
+            tokenId: 2,
+            tokenUri: "someipfsurl",
+            price: -1
+        })
+        console.log(`nft create res : ${JSON.stringify(createNFTRes)}`)
+        */
+
+        // const nfts = await klaytnGraph.commons.nftService.getAllNFTs({ tokenId: "1" });
+        //console.log(`nft : ${JSON.stringify(nfts)}`)
+
+        /*
+        const updateNFTOwnerRes = await klaytnGraph.commons.nftService.updateNFTOwner({
+            nextOwnerAddress: "someTEStNextOwneraddress1",
+            contractAddress: "testcontractaddress1",
+            tokenId: 2,
+            currentOwnerAddress: "someTEStNextOwneraddress"
+        })
+        console.log(`update nft owner res : ${JSON.stringify(updateNFTOwnerRes)}`)
+        */
+
+        const updateNFTPriceRes = await klaytnGraph.commons.nftService.updateNFTPrice({
+            ownerAddress: "someTEStNextOwneraddress1",
+            contractAddress: "testcontractaddress1",
+            tokenId: 2,
+            price: 12
+        })
+        console.log(`update nft price res : ${JSON.stringify(updateNFTPriceRes)}`)
     } catch (error) {
         console.log(`Error encountered : ${error}`)
     }
