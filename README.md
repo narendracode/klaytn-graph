@@ -20,3 +20,30 @@ knex migrate:latest
 knex seed:run
 ```
 
+### To build all project :
+```
+lerna run build
+```
+
+### environment variables
+- Inside `packages/listener` follow the format from `env.example` and create your `.env` file
+- Inside `packages/api` follow the format from `env.example` and create your `.env` file
+
+### To start listener in debug mode
+```
+cd packages/listener
+yarn start:dev
+```
+
+### To start api server in debug mode
+```
+cd packages/listener
+yarn start:dev
+```
+
+### To access graphql playgroud
+```
+http://localhost:5000/graphql
+```
+>> Before starting listener make sure you have set the block in DB to recent block so that it does not start syncing the past blocks. If you skip this step then it would take the data that is inserted from your knex seed step.
+
