@@ -9,6 +9,10 @@ export class BlockchainService {
         // this.caver = new Caver('https://api.baobab.klaytn.net:8651/');
     }
 
+    getCaver = (): Caver => {
+        return this.caver;
+    }
+
     useKey = (privateKey: string) => {
         const senderAddress = this.caver.klay.accounts.wallet.add(privateKey).address
         this.caver.wallet.add(this.caver.wallet.keyring.createFromPrivateKey(privateKey))
@@ -50,6 +54,25 @@ export class BlockchainService {
         let block = await this.caver.klay.getBlock(blockNum);
         const receipts = await this.caver.klay.getBlockReceipts(block["hash"]);
         return receipts;
+    }
+
+    getLatestBlock = async () => {
+        let currNetworkBlock = await this.caver.klay.getBlock("latest");
+        return Number(this.caver.utils.hexToNumber(currNetworkBlock.number)) - 2; // keeping two blocks behind
+    }
+
+    getKP17Contract = (contractAddress: string) => {
+        return new this.caver.contract(this.caver.kct.kip17.abi, contractAddress);
+    }
+
+    getEvents = async (contractAddress: string, blockNum: number, txHash: string) => {
+        const kp17Contract = new this.caver.klay.Contract(this.caver.kct.kip17.abi, contractAddress)
+        const allEvents = await kp17Contract.getPastEvents('allEvents', {
+            fromBlock: blockNum,
+            toBlock: blockNum
+        })
+        const allEventsFromTxHash = allEvents.filter((event) => { return event.address?.toLowerCase() === contractAddress && event.transactionHash === txHash });
+        return allEventsFromTxHash
     }
 
     hexToNumber = (hex: string): number => {

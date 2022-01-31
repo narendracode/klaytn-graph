@@ -16,7 +16,7 @@ class GlobalDao {
         if (dbBlock === null || dbBlock === undefined) {
             throw Error('Could not find block from ')
         }
-        return dbBlock;
+        return Number(dbBlock[0].block)
     }
 
     incrementBlock = async () => {
