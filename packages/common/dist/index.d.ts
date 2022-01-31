@@ -4,10 +4,8 @@ import NftDao from './daos/NFTDao';
 import ContractDao from './daos/ContractDao';
 import GlobalDao from './daos/GlobalDao';
 declare const dbService: DatabaseService;
-export declare const sayHello: () => void;
 export { dbService };
 export declare const commons: {
-    dbService: DatabaseService;
     klaytnService: typeof BlockchainService;
     nftService: NftDao;
     contractService: ContractDao;

@@ -4,7 +4,6 @@ import { ConnectionConfig } from "src/types/db.types";
 
 const log: debug.IDebugger = debug('app:database-service');
 
-
 export class DatabaseService {
     private knexDbConn: Knex;
 
@@ -19,7 +18,7 @@ export class DatabaseService {
                 password: connectionConfig.connection.password
             }
         });
-        log(`knex db connection object created.`)
+        log(`knex db connection object created with config : ${JSON.stringify(connectionConfig)}`)
     }
 
     get dbConn() {

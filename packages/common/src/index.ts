@@ -7,25 +7,21 @@ import GlobalDao from './daos/GlobalDao'
 const connectionConfig = {
     client: 'pg',
     connection: {
-        host: "localhost",
-        port: 5432,
-        database: "indexerdb",
-        user: "root",
-        password: "rootpassword"
+        host: process.env.DB_HOST || "localhost",
+        port: Number(process.env.DB_PORT) || 5432,
+        database: process.env.DB_NAME || "indexdb",
+        user: process.env.DB_USERNAME || "root",
+        password: process.env.DB_PASSWORD || "rootpassword"
     }
 }
+
 const dbService = new DatabaseService(connectionConfig);
 const nftDao = new NftDao()
 const contractDao = new ContractDao()
 const globalDao = new GlobalDao()
 
-export const sayHello = () => {
-    console.log(`Hello, hey hows it going.`)
-}
-
-export { dbService };
+export { dbService }; // exporting raw database connection object.
 export const commons = {
-    dbService: dbService,
     klaytnService: BlockchainService,
     nftService: nftDao,
     contractService: contractDao,

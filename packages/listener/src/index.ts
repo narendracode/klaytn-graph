@@ -1,3 +1,9 @@
+import dotenv from 'dotenv';
+const dotenvResult = dotenv.config();
+if (dotenvResult.error) {
+    throw dotenvResult.error;
+}
+
 import * as klaytnGraph from '@klaytn-graph/common'
 import { ContractType } from '@klaytn-graph/common/src/dtos/contract.dto';
 import { TransactionReceipt } from 'caver-js';
