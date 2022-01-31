@@ -1,18 +1,18 @@
 {
-    "extends": "../tsconfig.base.json",
-    "compilerOptions": {
-      "resolveJsonModule": true,
-      "esModuleInterop": true,
-      "outDir": "dist",
-      "rootDir": "src",
-      "baseUrl": "./",
-      "paths": {
-        "@klaytn-graph/common": ["../common/src"]
-      }
-    },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules", "**/__tests__/*", "**/__e2e__/*"],
-    "references": [
-      { "path": "../common" }
-    ]
-  }
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "baseUrl": "./",
+    "paths": {
+      "@klaytn-graph/common": ["../common/src"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/__tests__/*", "**/__e2e__/*"],
+  "references": [
+    { "path": "../common" }
+  ]
+}
