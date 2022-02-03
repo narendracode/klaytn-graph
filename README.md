@@ -47,3 +47,14 @@ http://localhost:5000/graphql
 ```
 >> Before starting listener make sure you have set the block in DB to recent block so that it does not start syncing the past blocks. If you skip this step then it would take the data that is inserted from your knex seed step.
 
+
+# Open for contribution
+
+## To do : 
+1. Add transaction block
+2. Add docker, docker-compose files
+3. Add files for kubernetes deployment
+4. Improve logging
+5. Code refactoring
+6. Test scripts
+4. Add support for KP7(Fungible token)
