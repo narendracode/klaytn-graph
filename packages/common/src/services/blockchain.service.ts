@@ -6,7 +6,6 @@ export class BlockchainService {
 
     constructor(networkUri: string) {
         this.caver = new Caver(networkUri);
-        // this.caver = new Caver('https://api.baobab.klaytn.net:8651/');
     }
 
     getCaver = (): Caver => {
