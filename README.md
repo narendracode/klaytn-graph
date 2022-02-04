@@ -51,10 +51,9 @@ http://localhost:5000/graphql
 # Open for contribution
 
 ## To do : 
-1. Add transaction block
-2. Add docker, docker-compose files
-3. Add files for kubernetes deployment
-4. Improve logging
-5. Code refactoring
-6. Test scripts
-4. Add support for KP7(Fungible token)
+1. Add docker, docker-compose files
+2. Add files for kubernetes deployment
+3. Improve logging
+4. Code refactoring
+5. Test scripts
+6. Add support for KP7(Fungible token)
