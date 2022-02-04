@@ -1,6 +1,8 @@
 import debug from "debug";
+import { Knex } from 'knex';
 import { DatabaseService } from "src/services/db.service";
 import { dbService } from '../index'
+
 const log: debug.IDebugger = debug('app:global-dao');
 
 class GlobalDao {
@@ -25,9 +27,20 @@ class GlobalDao {
         return incBlockRes;
     }
 
+    incrementBlockTx = async (tx: Knex.Transaction) => {
+        log(`Tx increment block in DB`);
+        const incBlockRes = await tx.from('global').increment("block", 1);
+        return incBlockRes;
+    }
+
     setBlock = async (block: number) => {
         log(`set current block to ${block}`)
         return this.dbService.dbConn.from('global').update({ block: block });
+    }
+
+    setBlockTx = async (block: number, tx: Knex.Transaction) => {
+        log(`Tx set current block to ${block}`)
+        return tx.from('global').update({ block: block });
     }
 }
 
