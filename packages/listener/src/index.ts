@@ -8,7 +8,8 @@ import * as klaytnGraph from '@klaytn-graph/common'
 import { ContractType } from '@klaytn-graph/common/src/dtos/contract.dto';
 import { TransactionReceipt } from 'caver-js';
 import { interfaceIds } from './util'
-const klaytnSrvc = new klaytnGraph.commons.klaytnService("https://api.baobab.klaytn.net:8651/");
+const klaytnSrvc = new klaytnGraph.commons.klaytnService(String(process.env.NETWORK_URL));
+const OX_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 const processContractCreation = async (receipt: TransactionReceipt) => {
     const contractAddress = receipt["contractAddress"];
@@ -58,7 +59,7 @@ const processContractFunctionExecution = async (receipt: TransactionReceipt) => 
                     const to = eventValues.to;
                     const tokenId = eventValues.tokenId
                     if (from && from.length && to && to.length && tokenId && tokenId.length) {
-                        if (from === "0x0000000000000000000000000000000000000000") {
+                        if (from === OX_ADDRESS) {
                             // token minted
                             const tokenUri = await klaytnSrvc.getTokenUri(contractAddress.toLowerCase(), Number(tokenId))
                             await klaytnGraph.commons.nftService.addNFT({
