@@ -5,13 +5,14 @@ if (dotenvResult.error) {
 }
 
 import * as klaytnGraph from '@klaytn-graph/common'
+import { dbService } from '@klaytn-graph/common';
 import { ContractType } from '@klaytn-graph/common/src/dtos/contract.dto';
 import { TransactionReceipt } from 'caver-js';
 import { interfaceIds } from './util'
 const klaytnSrvc = new klaytnGraph.commons.klaytnService(String(process.env.NETWORK_URL));
 const OX_ADDRESS = "0x0000000000000000000000000000000000000000"
 
-const processContractCreation = async (receipt: TransactionReceipt) => {
+const processContractCreation = async (receipt: TransactionReceipt, tx: any) => {
     const contractAddress = receipt["contractAddress"];
     const txHash = receipt["transactionHash"]
 
@@ -32,19 +33,20 @@ const processContractCreation = async (receipt: TransactionReceipt) => {
             symbol: symbol,
             type: ContractType.NFT
         }
-        await klaytnGraph.commons.contractService.addContract(contractCreationDto)
+        await klaytnGraph.commons.contractService.addContractTx(contractCreationDto, tx)
     } else {
         // just ignoring other type of contracts for now.
     }
 }
 
-const processContractFunctionExecution = async (receipt: TransactionReceipt) => {
+const processContractFunctionExecution = async (receipt: TransactionReceipt, tx: any) => {
     let txHash = receipt["transactionHash"]
     let ownerAddress = receipt["from"]
     let contractAddress = receipt["to"] ? receipt["to"].toLowerCase() : ""; //
 
     // check if contractAddress is something which is supposed to be tracked.
-    const existingContracts = await klaytnGraph.commons.contractService.findByContractAddress(contractAddress.toLowerCase())
+    console.log(`Checking contract exists query : ${contractAddress}`)
+    const existingContracts = await klaytnGraph.commons.contractService.findByContractAddressTx(contractAddress.toLowerCase(), tx)
     const isExistingContract = (existingContracts && existingContracts.length && existingContracts.length > 0)
     if (isExistingContract) {
         const blkNum = klaytnSrvc.hexToNumber(receipt["blockNumber"])
@@ -62,22 +64,22 @@ const processContractFunctionExecution = async (receipt: TransactionReceipt) => 
                         if (from === OX_ADDRESS) {
                             // token minted
                             const tokenUri = await klaytnSrvc.getTokenUri(contractAddress.toLowerCase(), Number(tokenId))
-                            await klaytnGraph.commons.nftService.addNFT({
+                            await klaytnGraph.commons.nftService.addNFTTx({
                                 contractAddress: contractAddress.toLowerCase(),
                                 ownerAddress: ownerAddress.toLowerCase(),
                                 tokenId: Number(tokenId),
                                 tokenUri: tokenUri,
                                 price: -1
-                            })
+                            }, tx)
                             console.log(`token minted with tokenId ${tokenId} in contract ${contractAddress.toLowerCase()}`)
                         } else {
                             // token transferred
-                            await klaytnGraph.commons.nftService.updateNFTOwner({
+                            await klaytnGraph.commons.nftService.updateNFTOwnerTx({
                                 nextOwnerAddress: to.toLowerCase(),
                                 contractAddress: contractAddress.toLowerCase(),
                                 tokenId: Number(tokenId),
                                 currentOwnerAddress: from.toLowerCase()
-                            })
+                            }, tx)
                             console.log(`token with tokenId ${tokenId} in contract ${contractAddress} transferred from ${from.toLowerCase()} to ${to.toLowerCase()}`)
                         }
                     }
@@ -91,7 +93,7 @@ const processContractFunctionExecution = async (receipt: TransactionReceipt) => 
     }
 }
 
-const processBlock = async (blockNum: number) => {
+const processBlockTx = async (blockNum: number, tx: any) => {
     console.log(`processing block : ${blockNum}`)
     const receipts = await klaytnSrvc.getTxReceipt(blockNum)
 
@@ -106,9 +108,9 @@ const processBlock = async (blockNum: number) => {
         // if receipt returns contract address then it is contract creation else it is function execution.
         if (receipt["contractAddress"] !== null) {
             // transaction is contract creation
-            await processContractCreation(receipt)
+            await processContractCreation(receipt, tx)
         } else {
-            await processContractFunctionExecution(receipt)
+            await processContractFunctionExecution(receipt, tx)
         }
     }
 }
@@ -120,8 +122,15 @@ const indexBlocks = async () => {
 
     const nextBlockInDB = currBlockInDB + 1;
     if (nextBlockInDB <= latestBlkInNwk) {
-        await processBlock(nextBlockInDB);
-        await klaytnGraph.commons.globalBlockService.incrementBlock()
+        const tx = await dbService.dbConn.transaction();
+        try {
+            await processBlockTx(nextBlockInDB, tx);
+            await klaytnGraph.commons.globalBlockService.incrementBlockTx(tx)
+            await tx.commit()
+        } catch (err) {
+            console.error(`error encountered while procesing blocks : ${err}`)
+            tx.rollback()
+        }
     } else {
         console.log(`Latest block in network ${latestBlkInNwk}, current block in DB is ${currBlockInDB}. Waiting for new block to be generated in network.`)
     }

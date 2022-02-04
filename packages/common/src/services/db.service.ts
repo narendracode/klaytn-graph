@@ -6,7 +6,6 @@ const log: debug.IDebugger = debug('app:database-service');
 
 export class DatabaseService {
     private knexDbConn: Knex;
-
     constructor(connectionConfig: ConnectionConfig) {
         this.knexDbConn = knex({
             client: connectionConfig.client,
