@@ -1,4 +1,5 @@
 import Caver from 'caver-js';
+import BigNumber from 'bignumber.js';
 
 export class BlockchainService {
     private caver: Caver;
@@ -27,6 +28,22 @@ export class BlockchainService {
         const deployedKP17 = await this.caver.kct.kip17.deploy({ name: name, symbol: symbol }, this.sender)
         const deployedContractAddress = deployedKP17.options.address
         const contractAbi = deployedKP17.options.jsonInterface
+        return [deployedContractAddress, contractAbi];
+    }
+
+    deployKP7 = async (name: string, symbol: string, decimals: number, alias: string, initialSupply: string, sendOptions: any) => {
+        const tokenInfo = {
+            name: name,
+            symbol: symbol,
+            decimals: decimals,
+            alias: '',
+            initialSupply: initialSupply
+        }
+        if (alias) tokenInfo.alias = alias;
+        if (!sendOptions) sendOptions = {};
+        const deployedKP7 = await this.caver.kct.kip7.deploy(tokenInfo, this.sender)
+        const deployedContractAddress = deployedKP7.options.address
+        const contractAbi = deployedKP7.options.jsonInterface
         return [deployedContractAddress, contractAbi];
     }
 

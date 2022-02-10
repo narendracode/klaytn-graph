@@ -137,7 +137,8 @@ const indexBlocks = async () => {
 
 }
 
-const test = async () => {
+
+const testKP17 = async () => {
     // run this only for testing.
 
     /*
@@ -190,8 +191,18 @@ const test = async () => {
     */
 }
 
+const testKP7 = async () => {
+    await klaytnSrvc.useKey("") // set your private key before making smart contract call.
+    const deployRes = await klaytnSrvc.deployKP7("Narendra Token", "NT", 10, '', '100000000', {});
+
+    const deployedContractAddress = deployRes[0];
+    console.log(`contract address : ${deployedContractAddress}`)
+}
+
 (async () => {
     // await test()
+    //await testKP7()
+
     setInterval(async () => {
         try {
             console.log(`Listener is running`)

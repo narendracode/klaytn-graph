@@ -14,7 +14,9 @@
     "clean": "rimraf dist coverage tsconfig.tsbuildinfo"
   },
   "dependencies": {
+    "@types/bignumber.js": "^5.0.0",
     "@types/debug": "^4.1.7",
+    "bignumber.js": "^9.0.2",
     "debug": "^4.3.3",
     "dotenv": "^14.3.2",
     "knex": "^1.0.1",
