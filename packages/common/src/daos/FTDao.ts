@@ -32,7 +32,7 @@ class FtDao {
 
     addFTTx = async (ftFields: CreateFTDto, tx: Knex.Transaction) => {
         log(`create FT entry for mint tx: ${JSON.stringify(ftFields)}`)
-        await tx.table('ft_history').insert({
+        await tx.insert({
             contractAddress: ftFields.contractAddress.toLowerCase(),
             from: OX_ADDRESS,
             to: ftFields.ownerAddress,
@@ -71,9 +71,9 @@ class FtDao {
                 })
                 .into('ft');
         }
-        return await this.dbService.dbConn.table('ft_history').insert({
+        return await this.dbService.dbConn.table('ft_history').insert(
             ftFields
-        }).into('ft_history')
+        ).into('ft_history')
     }
 
     updateFTBalanceTx = async (ftFields: UpdateFTBalanceDto, tx: Knex.Transaction) => {
@@ -103,9 +103,8 @@ class FtDao {
                 })
                 .into('ft');
         }
-        return await tx.table('ft_history').insert({
-            ftFields
-        }).into('ft_history')
+        return await tx.insert(ftFields)
+            .into('ft_history')
     }
 
     getBalance = async (searchFTQuery: SearchFTDto) => {

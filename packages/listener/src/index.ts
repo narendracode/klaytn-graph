@@ -6,9 +6,11 @@ if (dotenvResult.error) {
 
 import * as klaytnGraph from '@klaytn-graph/common'
 import { dbService } from '@klaytn-graph/common';
-import { ContractType } from '@klaytn-graph/common/src/dtos/contract.dto';
 import { TransactionReceipt } from 'caver-js';
 import { interfaceIds } from './util'
+import { addKP7Contract } from './processFT'
+import { addKP17Contract } from './processNFT';
+
 const klaytnSrvc = new klaytnGraph.commons.klaytnService(String(process.env.NETWORK_URL));
 const OX_ADDRESS = "0x0000000000000000000000000000000000000000"
 
@@ -33,34 +35,11 @@ const processContractCreation = async (receipt: TransactionReceipt, tx: any) => 
     }
 
     if (isKP17 && isIKIP17Metadata && isIKIP17Enumerable) {
-        const name = await kp17Contract.methods.name().call();
-        const symbol = await kp17Contract.methods.symbol().call();
-        const contractCreationDto = {
-            contractAddress: contractAddress,
-            deployerAddress: senderAddress,
-            name: name,
-            symbol: symbol,
-            type: ContractType.NFT
-        }
-        await klaytnGraph.commons.contractService.addContractTx(contractCreationDto, tx)
+        await addKP17Contract(contractAddress, senderAddress, kp17Contract, tx)
     } else if (isKP7) {
-        const name = await kp7Contract.methods.name().call();
-        const symbol = await kp7Contract.methods.symbol().call();
-        const totalSupply = await kp7Contract.methods.totalSupply().call();
-        const decimals = await kp7Contract.methods.decimals().call();
-        const contractCreationDto = {
-            contractAddress: contractAddress,
-            deployerAddress: senderAddress,
-            name: name,
-            symbol: symbol,
-            type: ContractType.FT,
-            totalSupply: totalSupply,
-            decimals: decimals
-        }
-        await klaytnGraph.commons.contractService.addContractTx(contractCreationDto, tx)
+        await addKP7Contract(contractAddress, senderAddress, kp7Contract, tx)
     }
     else {
-        console.log(`processContractCreation 3`)
         // just ignoring other type of contracts for now.
     }
 }
@@ -205,8 +184,6 @@ const indexBlocks = async () => {
     }
 
 }
-
-
 
 const delay = (time: number) => new Promise(res => setTimeout(res, time));
 (async () => {
