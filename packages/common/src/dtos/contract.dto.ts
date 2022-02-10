@@ -7,7 +7,7 @@ export enum TransactionType {
 
 export enum ContractType {
     NFT = "nft", // KP17
-    TOKEN = "token", // kp7
+    FT = "ft", // kp7
     OTHER = "other"
 }
 
@@ -36,7 +36,9 @@ export interface CreateContractDto {
     deployerAddress: string,
     name: string,
     symbol: string,
-    type: ContractType
+    type: ContractType,
+    totalSupply?: string,
+    decimals?: number
 }
 
 export type SearchContractDto = {
@@ -44,4 +46,12 @@ export type SearchContractDto = {
     deployerAddress?: string,
     symbol?: string,
     type?: ContractType
+}
+
+export type ContractInfoDto = {
+    address: string,
+    decimals?: number,
+    name: string,
+    symbol: string,
+    totalSupply?: string | number
 }

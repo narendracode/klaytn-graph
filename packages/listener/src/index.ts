@@ -16,16 +16,25 @@ const processContractCreation = async (receipt: TransactionReceipt, tx: any) => 
     const contractAddress = receipt["contractAddress"];
     const txHash = receipt["transactionHash"]
 
-    const senderAddress = receipt["from"]
-
-    const nftContract = klaytnSrvc.getKP17Contract(contractAddress);
-    const isKP17 = await nftContract.methods.supportsInterface(interfaceIds.kip17.IKIP17).call();
-    const isIKIP17Metadata = await nftContract.methods.supportsInterface(interfaceIds.kip17.IKIP17Metadata).call();
-    const isIKIP17Enumerable = await nftContract.methods.supportsInterface(interfaceIds.kip17.IKIP17Enumerable).call();
-    const name = await nftContract.methods.name().call();
-    const symbol = await nftContract.methods.symbol().call();
+    const senderAddress = receipt["from"].toLowerCase()
+    const kp17Contract = klaytnSrvc.getKP17Contract(contractAddress);
+    const kp7Contract = klaytnSrvc.getKP7Contract(contractAddress);
+    let isKP17 = false;
+    let isIKIP17Metadata = false;
+    let isIKIP17Enumerable = false;
+    let isKP7 = false;
+    try {
+        isKP17 = await kp17Contract.methods.supportsInterface(interfaceIds.kip17.IKIP17).call();
+        isIKIP17Metadata = await kp17Contract.methods.supportsInterface(interfaceIds.kip17.IKIP17Metadata).call();
+        isIKIP17Enumerable = await kp17Contract.methods.supportsInterface(interfaceIds.kip17.IKIP17Enumerable).call();
+        isKP7 = await kp7Contract.methods.supportsInterface(interfaceIds.kip7.IKIP7).call();
+    } catch (err) {
+        console.log(`Error encounted while checking supportedInterface in contract with Address ${contractAddress}, possibly it is some custom contract.`)
+    }
 
     if (isKP17 && isIKIP17Metadata && isIKIP17Enumerable) {
+        const name = await kp17Contract.methods.name().call();
+        const symbol = await kp17Contract.methods.symbol().call();
         const contractCreationDto = {
             contractAddress: contractAddress,
             deployerAddress: senderAddress,
@@ -34,8 +43,91 @@ const processContractCreation = async (receipt: TransactionReceipt, tx: any) => 
             type: ContractType.NFT
         }
         await klaytnGraph.commons.contractService.addContractTx(contractCreationDto, tx)
-    } else {
+    } else if (isKP7) {
+        const name = await kp7Contract.methods.name().call();
+        const symbol = await kp7Contract.methods.symbol().call();
+        const totalSupply = await kp7Contract.methods.totalSupply().call();
+        const decimals = await kp7Contract.methods.decimals().call();
+        const contractCreationDto = {
+            contractAddress: contractAddress,
+            deployerAddress: senderAddress,
+            name: name,
+            symbol: symbol,
+            type: ContractType.FT,
+            totalSupply: totalSupply,
+            decimals: decimals
+        }
+        await klaytnGraph.commons.contractService.addContractTx(contractCreationDto, tx)
+    }
+    else {
+        console.log(`processContractCreation 3`)
         // just ignoring other type of contracts for now.
+    }
+}
+
+const transferToken = async (contractAddress: string, ownerAddress: string, contractType: string, event: any, tx: any) => {
+    if (contractType === 'ft') {
+        await transferFT(contractAddress, ownerAddress, event, tx)
+    } else {
+        await transferNFT(contractAddress, ownerAddress, event, tx)
+    }
+}
+
+const transferNFT = async (contractAddress: string, ownerAddress: string, event: any, tx: any) => {
+    const eventValues = event.returnValues ? event.returnValues : {};
+    const from = eventValues.from;
+    const to = eventValues.to;
+    const tokenId = eventValues.tokenId
+    if (from && from.length && to && to.length && tokenId && tokenId.length) {
+        if (from === OX_ADDRESS) {
+            // token minted
+            const tokenUri = await klaytnSrvc.getTokenUri(contractAddress.toLowerCase(), Number(tokenId))
+            await klaytnGraph.commons.nftService.addNFTTx({
+                contractAddress: contractAddress.toLowerCase(),
+                ownerAddress: ownerAddress.toLowerCase(),
+                tokenId: Number(tokenId),
+                tokenUri: tokenUri,
+                price: -1
+            }, tx)
+            console.log(`token minted with tokenId ${tokenId} in contract ${contractAddress.toLowerCase()}`)
+        } else {
+            // token transferred
+            await klaytnGraph.commons.nftService.updateNFTOwnerTx({
+                nextOwnerAddress: to.toLowerCase(),
+                contractAddress: contractAddress.toLowerCase(),
+                tokenId: Number(tokenId),
+                currentOwnerAddress: from.toLowerCase()
+            }, tx)
+            console.log(`token with tokenId ${tokenId} in contract ${contractAddress} transferred from ${from.toLowerCase()} to ${to.toLowerCase()}`)
+        }
+    }
+}
+
+const transferFT = async (contractAddress: string, ownerAddress: string, event: any, tx: any) => {
+    const eventValues = event.returnValues ? event.returnValues : {};
+    const from = eventValues.from.toLowerCase();
+    const to = eventValues.to.toLowerCase();
+    const value = eventValues.value
+    console.log(`from : ${from} , to : ${to}, value : ${value}`)
+    if (from && from.length && to && to.length && value && value.length) {
+        if (from === OX_ADDRESS) {
+            console.log(`tokens minted`)
+            await klaytnGraph.commons.ftSservice.addFTTx({
+                contractAddress: contractAddress.toLowerCase(),
+                ownerAddress: ownerAddress.toLowerCase(),
+                amount: value
+            }, tx)
+            console.log(`tokens minted in contract ${contractAddress.toLowerCase()} with initial supply of ${value} to ${to}`)
+        } else {
+            console.log(`tokens transferred`)
+            await klaytnGraph.commons.ftSservice.updateFTBalanceTx({
+                contractAddress: contractAddress.toLowerCase(),
+                from: from,
+                to: to,
+                amount: value
+            }, tx)
+            console.log(`transferred tokens in contract ${contractAddress.toLowerCase()} from : ${from} to : ${to} with amount ${value}`)
+        }
     }
 }
 
@@ -45,44 +137,21 @@ const processContractFunctionExecution = async (receipt: TransactionReceipt, tx:
     let contractAddress = receipt["to"] ? receipt["to"].toLowerCase() : ""; //
 
     // check if contractAddress is something which is supposed to be tracked.
-    console.log(`Checking contract exists query : ${contractAddress}`)
+    console.log(`Checking contract exists for address : ${contractAddress}`)
     const existingContracts = await klaytnGraph.commons.contractService.findByContractAddressTx(contractAddress.toLowerCase(), tx)
+
     const isExistingContract = (existingContracts && existingContracts.length && existingContracts.length > 0)
     if (isExistingContract) {
         const blkNum = klaytnSrvc.hexToNumber(receipt["blockNumber"])
-        const allEvents = await klaytnSrvc.getEvents(contractAddress, blkNum, txHash);
+        const contractType = existingContracts[0].type;
+        const allEvents = await klaytnSrvc.getEvents(contractAddress, blkNum, txHash, contractType);
         for (let index = 0; index < allEvents.length; index++) {
             const event = allEvents[index];
             const eventName = event.event;
+            console.log(`processing event ${eventName} for txHash ${txHash}`)
             switch (eventName) {
                 case "Transfer": {
-                    const eventValues = event.returnValues ? event.returnValues : {};
-                    const from = eventValues.from;
-                    const to = eventValues.to;
-                    const tokenId = eventValues.tokenId
-                    if (from && from.length && to && to.length && tokenId && tokenId.length) {
-                        if (from === OX_ADDRESS) {
-                            // token minted
-                            const tokenUri = await klaytnSrvc.getTokenUri(contractAddress.toLowerCase(), Number(tokenId))
-                            await klaytnGraph.commons.nftService.addNFTTx({
-                                contractAddress: contractAddress.toLowerCase(),
-                                ownerAddress: ownerAddress.toLowerCase(),
-                                tokenId: Number(tokenId),
-                                tokenUri: tokenUri,
-                                price: -1
-                            }, tx)
-                            console.log(`token minted with tokenId ${tokenId} in contract ${contractAddress.toLowerCase()}`)
-                        } else {
-                            // token transferred
-                            await klaytnGraph.commons.nftService.updateNFTOwnerTx({
-                                nextOwnerAddress: to.toLowerCase(),
-                                contractAddress: contractAddress.toLowerCase(),
-                                tokenId: Number(tokenId),
-                                currentOwnerAddress: from.toLowerCase()
-                            }, tx)
-                            console.log(`token with tokenId ${tokenId} in contract ${contractAddress} transferred from ${from.toLowerCase()} to ${to.toLowerCase()}`)
-                        }
-                    }
+                    await transferToken(contractAddress, ownerAddress, contractType, event, tx)
                     break;
                 }
                 default: {
@@ -192,24 +261,32 @@ const testKP17 = async () => {
 }
 
 const testKP7 = async () => {
-    await klaytnSrvc.useKey("") // set your private key before making smart contract call.
+    /*
+    await klaytnSrvc.useKey("0x3ce9f63a378c070f9ef02ae60a4fc8ab65563f618b31d612095416c69e0eee63") // set your private key before making smart contract call.
     const deployRes = await klaytnSrvc.deployKP7("Narendra Token", "NT", 10, '', '100000000', {});
 
     const deployedContractAddress = deployRes[0];
     console.log(`contract address : ${deployedContractAddress}`)
-}
+    */
+    const contractAddr = "0x194d9f0E233a693eAaBFEe4ed7C66Ab6732c10cb";
+    const block = "82903091";
 
+}
+const delay = (time: number) => new Promise(res => setTimeout(res, time));
 (async () => {
     // await test()
-    //await testKP7()
+    // await testKP7()
 
-    setInterval(async () => {
+    while (true) {
+        //running it in infinite loop like mad
         try {
-            console.log(`Listener is running`)
+            console.log(`start running`)
             await indexBlocks();
+            console.log(`completed`)
+            await delay(500) // sleep for half second.
         } catch (error) {
             console.log(`Error encountered : ${error}`)
         }
-
-    }, 500) // klaytn generates new block every one second it seems hence it makes sense to run this every 0.5 seconds
+    }
+    // klaytn generates new block every one second it seems hence it makes sense to run this every 0.5 seconds
 })();

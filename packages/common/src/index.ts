@@ -3,6 +3,7 @@ import { BlockchainService } from './services/blockchain.service'
 import NftDao from './daos/NFTDao'
 import ContractDao from './daos/ContractDao'
 import GlobalDao from './daos/GlobalDao'
+import FtDao from './daos/FTDao'
 
 const connectionConfig = {
     client: 'pg',
@@ -19,11 +20,12 @@ const dbService = new DatabaseService(connectionConfig);
 const nftDao = new NftDao()
 const contractDao = new ContractDao()
 const globalDao = new GlobalDao()
-
+const ftDao = new FtDao()
 export { dbService }; // exporting raw database connection object.
 export const commons = {
     klaytnService: BlockchainService,
     nftService: nftDao,
+    ftSservice: ftDao,
     contractService: contractDao,
     globalBlockService: globalDao
 }

@@ -47,6 +47,12 @@ http://localhost:5000/graphql
 ```
 >> Before starting listener make sure you have set the block in DB to recent block so that it does not start syncing the past blocks. If you skip this step then it would take the data that is inserted from your knex seed step.
 
+### to update schema
+```
+knex migrate:make add_new_column_to_table
+// update file generated under data folder
+knex migrate:latest
+```
 
 # Open for contribution
 

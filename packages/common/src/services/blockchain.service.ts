@@ -81,9 +81,20 @@ export class BlockchainService {
         return new this.caver.contract(this.caver.kct.kip17.abi, contractAddress);
     }
 
-    getEvents = async (contractAddress: string, blockNum: number, txHash: string) => {
-        const kp17Contract = new this.caver.klay.Contract(this.caver.kct.kip17.abi, contractAddress)
-        const allEvents = await kp17Contract.getPastEvents('allEvents', {
+    getKP7Contract = (contractAddress: string) => {
+        return new this.caver.contract(this.caver.kct.kip7.abi, contractAddress);
+    }
+
+    getContract = (contractAddress: string, contractType: string) => {
+        if (contractType === 'ft') {
+            return new this.caver.klay.Contract(this.caver.kct.kip7.abi, contractAddress)
+        } else {
+            return new this.caver.klay.Contract(this.caver.kct.kip17.abi, contractAddress)
+        }
+    }
+    getEvents = async (contractAddress: string, blockNum: number, txHash: string, contractType: string) => {
+        console.log(`Get events for contract with address ${contractAddress} and type : ${contractType}`)
+        const allEvents = await this.getContract(contractAddress, contractType).getPastEvents('allEvents', {
             fromBlock: blockNum,
             toBlock: blockNum
         })
