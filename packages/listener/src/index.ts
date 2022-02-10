@@ -207,76 +207,9 @@ const indexBlocks = async () => {
 }
 
 
-const testKP17 = async () => {
-    // run this only for testing.
 
-    /*
-    // deploy new contract
-    await klaytnSrvc.useKey("") // set your private key before making smart contract call.
-    const [nftAddress, abi] = await klaytnSrvc.deployKP17("Neelima Token", "NFT")
-    console.log(`New token contract deployed at address : ${nftAddress}`) // 0x57E913FDAbe0DC8aB80000A2C32645dba73B059D
-    */
-
-    //const [address,abi] = await deployKP17();
-
-    const address = "0x2ae2e621Ee0152d9B13D5B5AF25EB1c0f091c682";//1. smart contract address
-    //const blockNum = 81708921; // nft contract deploy
-
-    /*
-    // mint new token
-    await klaytnSrvc.useKey("")
-    await klaytnSrvc.mint("0x57E913FDAbe0DC8aB80000A2C32645dba73B059D", "https://ipfs.io/ipfs/QmNrZAd5tGuL9LXj7QTLNPdRpsKUZMgRpqnKs9KTJtWtLi", 1)
-    */
-    //const blockNum = 81767413; // nft mint
-
-    /*
-    // transfer token
-    // await klaytnSrvc.useKey("")
-    // await klaytnSrvc.transfer("0x57E913FDAbe0DC8aB80000A2C32645dba73B059D", "0x7d5236c8f1199d9d072C0CCa6a9C74A0e6C8Bbe5", 1)
-   */
-    //const blockNum = 81782471; //nft transfer
-    //await klaytnGraph.commons.globalBlockService.setBlock(81782470);
-
-    // console.log(version)
-
-    //const contracts = await klaytnGraph.commons.contractService.getAllContracts();
-    //console.log(`contracts : ${JSON.stringify(contracts)}`)
-
-    //const contractFindByRes = await klaytnGraph.commons.contractService.findByContractAddress("testcontractaddress")
-    //const contractFindByRes = await klaytnGraph.commons.contractService.find({ type: ContractType.NFT })
-    //console.log(`contractFindByRes : ${JSON.stringify(contractFindByRes)}`)
-
-    // const nfts = await klaytnGraph.commons.nftService.getAllNFTs({ tokenId: "1" });
-    //console.log(`nft : ${JSON.stringify(nfts)}`)
-
-    /*
-    const updateNFTPriceRes = await klaytnGraph.commons.nftService.updateNFTPrice({
-        ownerAddress: "someTEStNextOwneraddress1",
-        contractAddress: "testcontractaddress1",
-        tokenId: 2,
-        price: 12
-    })
-    console.log(`update nft price res : ${JSON.stringify(updateNFTPriceRes)}`)
-    */
-}
-
-const testKP7 = async () => {
-    /*
-    await klaytnSrvc.useKey("0x3ce9f63a378c070f9ef02ae60a4fc8ab65563f618b31d612095416c69e0eee63") // set your private key before making smart contract call.
-    const deployRes = await klaytnSrvc.deployKP7("Narendra Token", "NT", 10, '', '100000000', {});
-
-    const deployedContractAddress = deployRes[0];
-    console.log(`contract address : ${deployedContractAddress}`)
-    */
-    const contractAddr = "0x194d9f0E233a693eAaBFEe4ed7C66Ab6732c10cb";
-    const block = "82903091";
-
-}
 const delay = (time: number) => new Promise(res => setTimeout(res, time));
 (async () => {
-    // await test()
-    // await testKP7()
-
     while (true) {
         //running it in infinite loop like mad
         try {
