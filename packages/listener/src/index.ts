@@ -114,12 +114,16 @@ const processBlockTx = async (blockNum: number, tx: any) => {
             console.log(`status for transaction is not 1.`)
             continue;
         }
-        // if receipt returns contract address then it is contract creation else it is function execution.
-        if (receipt["contractAddress"] !== null) {
+        const txType = receipt['type']
+        console.log(`TxType : ${txType}`)
+        if (txType === 'TxTypeSmartContractDeploy') {
             // transaction is contract creation
             await processContractCreation(receipt, tx)
-        } else {
+        } else if (txType === 'TxTypeSmartContractExecution') {
             await processContractFunctionExecution(receipt, tx)
+        } else {
+            // ignore if some other transaction type
+            console.log(`TxType found ${txType}, ignore it.`)
         }
     }
 }
