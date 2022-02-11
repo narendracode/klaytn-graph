@@ -22,11 +22,17 @@ class FtDao {
             contractAddress: ftFields.contractAddress.toLowerCase(),
             from: OX_ADDRESS,
             to: ftFields.ownerAddress,
-            amount: ftFields.amount
+            amount: ftFields.amount,
+            txhash: ftFields.txhash
         }).into('ft_history')
 
         return await this.dbService.dbConn
-            .insert(ftFields)
+            .insert({
+                contractAddress: ftFields.contractAddress,
+                ownerAddress: ftFields.ownerAddress,
+                amount: ftFields.amount,
+                last_txhash: ftFields.txhash
+            })
             .into('ft');
     }
 
@@ -36,11 +42,17 @@ class FtDao {
             contractAddress: ftFields.contractAddress.toLowerCase(),
             from: OX_ADDRESS,
             to: ftFields.ownerAddress,
-            amount: ftFields.amount
+            amount: ftFields.amount,
+            txhash: ftFields.txhash
         }).into('ft_history')
 
         return await tx
-            .insert(ftFields)
+            .insert({
+                contractAddress: ftFields.contractAddress,
+                ownerAddress: ftFields.ownerAddress,
+                amount: ftFields.amount,
+                last_txhash: ftFields.txhash
+            })
             .into('ft');
     }
 
@@ -49,6 +61,10 @@ class FtDao {
         await this.dbService.dbConn.from('ft')
             .where({ ownerAddress: ftFields.from.toLowerCase() })
             .decrement("amount", ftFields.amount)
+
+        await this.dbService.dbConn.from('ft')
+            .where({ ownerAddress: ftFields.from.toLowerCase() })
+            .update({ last_txhash: ftFields.txhash })
 
         // checking if to address exists in DB
         const findToAddr = await this.dbService.dbConn
@@ -71,6 +87,10 @@ class FtDao {
                 })
                 .into('ft');
         }
+        await this.dbService.dbConn.from('ft')
+            .where({ ownerAddress: ftFields.to.toLowerCase() })
+            .update({ last_txhash: ftFields.txhash })
+
         return await this.dbService.dbConn.table('ft_history').insert(
             ftFields
         ).into('ft_history')
@@ -81,6 +101,10 @@ class FtDao {
         await tx.from('ft')
             .where({ ownerAddress: ftFields.from.toLowerCase() })
             .decrement("amount", ftFields.amount)
+
+        await tx.from('ft')
+            .where({ ownerAddress: ftFields.from.toLowerCase() })
+            .update({ last_txhash: ftFields.txhash })
 
         // checking if to address exists in DB
         const findToAddr = await tx
@@ -103,6 +127,10 @@ class FtDao {
                 })
                 .into('ft');
         }
+        await tx.from('ft')
+            .where({ ownerAddress: ftFields.to.toLowerCase() })
+            .update({ last_txhash: ftFields.txhash })
+
         return await tx.insert(ftFields)
             .into('ft_history')
     }

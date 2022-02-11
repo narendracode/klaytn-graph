@@ -38,7 +38,8 @@ export interface CreateContractDto {
     symbol: string,
     type: ContractType,
     totalSupply?: string,
-    decimals?: number
+    decimals?: number,
+    txhash: string
 }
 
 export type SearchContractDto = {

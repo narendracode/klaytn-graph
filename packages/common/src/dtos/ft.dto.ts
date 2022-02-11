@@ -1,7 +1,8 @@
 export interface CreateFTDto {
     contractAddress: string,
     ownerAddress: string,
-    amount: number
+    amount: number,
+    txhash: string
 }
 
 export type SearchFTDto = {
@@ -13,5 +14,6 @@ export type UpdateFTBalanceDto = {
     contractAddress: string,
     from: string,
     to: string,
-    amount: number
+    amount: number,
+    txhash: string
 }

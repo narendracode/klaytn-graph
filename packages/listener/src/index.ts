@@ -8,11 +8,10 @@ import * as klaytnGraph from '@klaytn-graph/common'
 import { dbService } from '@klaytn-graph/common';
 import { TransactionReceipt } from 'caver-js';
 import { interfaceIds } from './util'
-import { addKP7Contract } from './processFT'
-import { addKP17Contract } from './processNFT';
+import { addKP7Contract, transferFT } from './processFT'
+import { addKP17Contract, transferNFT } from './processNFT';
 
 const klaytnSrvc = new klaytnGraph.commons.klaytnService(String(process.env.NETWORK_URL));
-const OX_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 const processContractCreation = async (receipt: TransactionReceipt, tx: any) => {
     const contractAddress = receipt["contractAddress"];
@@ -35,78 +34,32 @@ const processContractCreation = async (receipt: TransactionReceipt, tx: any) => 
     }
 
     if (isKP17 && isIKIP17Metadata && isIKIP17Enumerable) {
-        await addKP17Contract(contractAddress, senderAddress, kp17Contract, tx)
+        await addKP17Contract(contractAddress, senderAddress, kp17Contract, txHash, tx)
     } else if (isKP7) {
-        await addKP7Contract(contractAddress, senderAddress, kp7Contract, tx)
+        await addKP7Contract(contractAddress, senderAddress, kp7Contract, txHash, tx)
+
+        // process events
+        const blkNum = klaytnSrvc.hexToNumber(receipt["blockNumber"])
+        const contractType = "ft";
+        let ownerAddress = receipt["from"]
+        const allEvents = await klaytnSrvc.getEvents(contractAddress, blkNum, txHash, contractType);
+        for (let index = 0; index < allEvents.length; index++) {
+            const event = allEvents[index];
+            const eventName = event.event;
+            console.log(`processing event ${eventName} for txHash ${txHash}`)
+            switch (eventName) {
+                case "Transfer": {
+                    await transferFT(contractAddress, ownerAddress, event, txHash, tx)
+                    break;
+                }
+                default: {
+                    console.log(`Event ${eventName} is not in use. Ignore.`)
+                }
+            }
+        }
     }
     else {
         // just ignoring other type of contracts for now.
-    }
-}
-
-const transferToken = async (contractAddress: string, ownerAddress: string, contractType: string, event: any, tx: any) => {
-    if (contractType === 'ft') {
-        await transferFT(contractAddress, ownerAddress, event, tx)
-    } else {
-        await transferNFT(contractAddress, ownerAddress, event, tx)
-    }
-}
-
-const transferNFT = async (contractAddress: string, ownerAddress: string, event: any, tx: any) => {
-    const eventValues = event.returnValues ? event.returnValues : {};
-    const from = eventValues.from;
-    const to = eventValues.to;
-    const tokenId = eventValues.tokenId
-    if (from && from.length && to && to.length && tokenId && tokenId.length) {
-        if (from === OX_ADDRESS) {
-            // token minted
-            const tokenUri = await klaytnSrvc.getTokenUri(contractAddress.toLowerCase(), Number(tokenId))
-            await klaytnGraph.commons.nftService.addNFTTx({
-                contractAddress: contractAddress.toLowerCase(),
-                ownerAddress: ownerAddress.toLowerCase(),
-                tokenId: Number(tokenId),
-                tokenUri: tokenUri,
-                price: -1
-            }, tx)
-            console.log(`token minted with tokenId ${tokenId} in contract ${contractAddress.toLowerCase()}`)
-        } else {
-            // token transferred
-            await klaytnGraph.commons.nftService.updateNFTOwnerTx({
-                nextOwnerAddress: to.toLowerCase(),
-                contractAddress: contractAddress.toLowerCase(),
-                tokenId: Number(tokenId),
-                currentOwnerAddress: from.toLowerCase()
-            }, tx)
-            console.log(`token with tokenId ${tokenId} in contract ${contractAddress} transferred from ${from.toLowerCase()} to ${to.toLowerCase()}`)
-        }
-    }
-}
-
-const transferFT = async (contractAddress: string, ownerAddress: string, event: any, tx: any) => {
-    const eventValues = event.returnValues ? event.returnValues : {};
-    const from = eventValues.from.toLowerCase();
-    const to = eventValues.to.toLowerCase();
-    const value = eventValues.value
-    console.log(`from : ${from} , to : ${to}, value : ${value}`)
-    if (from && from.length && to && to.length && value && value.length) {
-        if (from === OX_ADDRESS) {
-            console.log(`tokens minted`)
-            await klaytnGraph.commons.ftSservice.addFTTx({
-                contractAddress: contractAddress.toLowerCase(),
-                ownerAddress: ownerAddress.toLowerCase(),
-                amount: value
-            }, tx)
-            console.log(`tokens minted in contract ${contractAddress.toLowerCase()} with initial supply of ${value} to ${to}`)
-        } else {
-            console.log(`tokens transferred`)
-            await klaytnGraph.commons.ftSservice.updateFTBalanceTx({
-                contractAddress: contractAddress.toLowerCase(),
-                from: from,
-                to: to,
-                amount: value
-            }, tx)
-            console.log(`transferred tokens in contract ${contractAddress.toLowerCase()} from : ${from} to : ${to} with amount ${value}`)
-        }
     }
 }
 
@@ -130,7 +83,7 @@ const processContractFunctionExecution = async (receipt: TransactionReceipt, tx:
             console.log(`processing event ${eventName} for txHash ${txHash}`)
             switch (eventName) {
                 case "Transfer": {
-                    await transferToken(contractAddress, ownerAddress, contractType, event, tx)
+                    await transferToken(contractAddress, ownerAddress, contractType, event, txHash, tx)
                     break;
                 }
                 default: {
@@ -138,6 +91,14 @@ const processContractFunctionExecution = async (receipt: TransactionReceipt, tx:
                 }
             }
         }
+    }
+}
+
+const transferToken = async (contractAddress: string, ownerAddress: string, contractType: string, event: any, txhash: string, tx: any) => {
+    if (contractType === 'ft') {
+        await transferFT(contractAddress, ownerAddress, event, txhash, tx)
+    } else {
+        await transferNFT(contractAddress, ownerAddress, event, txhash, tx)
     }
 }
 
