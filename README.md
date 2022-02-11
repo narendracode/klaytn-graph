@@ -54,6 +54,62 @@ knex migrate:make add_new_column_to_table
 knex migrate:latest
 ```
 
+### Graphql Queries
+```
+query {
+  getAllNfts{
+    tokenId,
+    tokenUri,
+    contractAddress
+  }
+}
+
+query {
+  getAllNfts(contractAddress:"0x2ae2e621ee0152d9b13d5b5af25eb1c0f091c682"){
+    tokenId,
+    tokenUri,
+    ownerAddress,
+    contractAddress
+  }
+}
+
+query{
+  getAllContracts{
+    contractAddress,
+    deployerAddress,
+    type,
+    name,
+    symbol,
+    totalSupply,
+    txhash,
+    created_at,
+    updated_at
+  }
+}
+
+query{
+  getAllFts{
+    contractAddress,
+    ownerAddress,
+    amount,
+    last_txhash,
+    created_at,
+    updated_at
+  }
+}
+
+query{
+  getAllFTHistory{
+    contractAddress,
+    from,
+    to,
+    amount,
+    created_at,
+    updated_at
+  }
+}
+```
+
 # Open for contribution
 
 ## To do : 

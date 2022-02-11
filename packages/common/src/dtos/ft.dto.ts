@@ -10,6 +10,10 @@ export type SearchFTDto = {
     contractAddress?: string
 }
 
+export type SearchFTHistoryDto = {
+    contractAddress?: string
+}
+
 export type UpdateFTBalanceDto = {
     contractAddress: string,
     from: string,

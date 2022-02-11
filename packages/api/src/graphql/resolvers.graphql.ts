@@ -1,6 +1,7 @@
 import * as klaytnGraph from '@klaytn-graph/common'
 import { SearchNFTDto, CreateNFTDto } from '@klaytn-graph/common/src/dtos/nft.dto';
-import { CreateContractDto } from '@klaytn-graph/common/src/dtos/contract.dto';
+import { SearchFTDto } from '@klaytn-graph/common/src/dtos/ft.dto';
+import { CreateContractDto, SearchContractDto } from '@klaytn-graph/common/src/dtos/contract.dto';
 
 export const resolvers = {
     Query: {
@@ -22,6 +23,37 @@ export const resolvers = {
             }
 
             return await klaytnGraph.commons.nftService.getAllNFTs(searchQuery);
+        },
+        getAllFts: async (root: any, input: any) => {
+            let searchQuery: SearchFTDto = {}
+            const contractAddress = input.contractAddress;
+            const ownerAddress = input.ownerAddress;
+            console.log(`getAllFTs resolver with owner : ${ownerAddress}, address : ${contractAddress}}`)
+
+            if (ownerAddress && ownerAddress.length) {
+                searchQuery.ownerAddress = ownerAddress;
+            }
+
+            if (contractAddress && contractAddress.length) {
+                searchQuery.contractAddress = contractAddress;
+            }
+
+            return await klaytnGraph.commons.ftSservice.getBalance(searchQuery)
+        },
+        getAllFTHistory: async (root: any, input: any) => {
+            const contractAddress = input.contractAddress;
+            console.log(`get ft history resolver with contract address : ${contractAddress}}`)
+
+            return await klaytnGraph.commons.ftSservice.getHistory(contractAddress)
+        },
+        getAllContracts: async (root: any, input: any) => {
+            let searchQuery: SearchContractDto = {}
+            const type = input.type;
+            console.log(`get all contracts with type : ${type}`)
+            if (type && type.input) {
+                searchQuery.type = type;
+            }
+            return await klaytnGraph.commons.contractService.find(searchQuery);
         }
     },
     Mutation: {

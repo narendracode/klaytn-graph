@@ -2,7 +2,7 @@ import debug from "debug";
 import { Knex } from 'knex';
 import { DatabaseService } from "src/services/db.service";
 import { dbService } from '../index'
-import { CreateFTDto, UpdateFTBalanceDto, SearchFTDto } from "src/dtos/ft.dto";
+import { CreateFTDto, UpdateFTBalanceDto, SearchFTDto, SearchFTHistoryDto } from "src/dtos/ft.dto";
 import BigNumber from "bignumber.js";
 const log: debug.IDebugger = debug('app:nft-dao');
 
@@ -141,6 +141,21 @@ class FtDao {
             .select("*")
             .from("ft")
             .where(searchFTQuery);
+    }
+
+    getHistory = async (contractAddress: string) => {
+        log(`get ft history by contract address : ${contractAddress}`)
+        let query: SearchFTHistoryDto = {
+
+        }
+        if (contractAddress && contractAddress.length) {
+            query.contractAddress = contractAddress
+        }
+
+        return await this.dbService.dbConn
+            .select("*")
+            .from("ft_history")
+            .where(query);
     }
 
     getBalanceTx = async (searchFTQuery: SearchFTDto, tx: Knex.Transaction) => {

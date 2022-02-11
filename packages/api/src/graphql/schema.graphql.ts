@@ -1,18 +1,23 @@
 import { gql } from 'apollo-server';
+
 export const typeDefs = gql`
     type Contract{
        id:ID
        contractAddress:String
-       deployer:String
+       deployerAddress:String
        type: ContractType
-       owner:String
-       createdAt: String
-       updatedAt: String
+       name: String
+       symbol: String
+       totalSupply: String
+       decimals: String
+       txhash: String
+       created_at:String
+       updated_at: String
     }
 
     enum ContractType {
         nft
-        token
+        ft
         other
     }
 
@@ -24,6 +29,25 @@ export const typeDefs = gql`
         price: String
         createdAt: String
         updatedAt: String
+    }
+
+    type FT {
+        contractAddress: String
+        ownerAddress: String
+        amount: String
+        last_txhash: String
+        created_at: String
+        updated_at: String
+    }
+
+    type FTHistory {
+        contractAddress: String
+        from: String
+        to: String
+        amount: String
+        txhash: String
+        created_at: String
+        updated_at: String
     }
 
     input ContractInput{
@@ -47,6 +71,9 @@ export const typeDefs = gql`
 
     type Query{
         getAllNfts(contractAddress: String, tokenId: String, ownerAddress: String):[NFT]
+        getAllContracts(type: String): [Contract]
+        getAllFts(contractAddress: String, ownerAddress: String): [FT]
+        getAllFTHistory(contractAddress: String, ownerAddress: String): [FTHistory]
     }
 
     type Mutation{
