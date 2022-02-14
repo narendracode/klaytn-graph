@@ -10,7 +10,7 @@ import winston from 'winston';
 import * as expressWinston from 'express-winston';
 import cors from 'cors';
 import debug from 'debug';
-import { ApolloServer } from 'apollo-server-express'
+import { ApolloServer } from 'apollo-server-express';
 import { resolvers } from './graphql/resolvers.graphql';
 import { typeDefs } from './graphql/schema.graphql';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';

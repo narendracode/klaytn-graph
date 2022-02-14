@@ -1,13 +1,15 @@
 {
   "name": "@klaytn-graph/common",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "main": "dist/index.js",
+  "unpkg": "dist/index.js",
+  "jsdelivr": "dist/index.js",
   "files": [
     "dist"
   ],
   "license": "MIT",
   "author": "Narendra Soni",
-  "private": true,
+  "private": false,
   "scripts": {
     "build": "run-s clean build:tsc",
     "build:tsc": "tsc -b",
@@ -17,6 +19,7 @@
     "@types/bignumber.js": "^5.0.0",
     "@types/debug": "^4.1.7",
     "bignumber.js": "^9.0.2",
+    "caver-js": "^1.6.8-rc.2",
     "debug": "^4.3.3",
     "dotenv": "^14.3.2",
     "knex": "^1.0.1",

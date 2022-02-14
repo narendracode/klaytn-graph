@@ -1,4 +1,4 @@
-import { ContractType } from "@klaytn-graph/common/src/dtos/contract.dto"
+import { ContractType } from "@klaytn-graph/common"
 import * as klaytnGraph from '@klaytn-graph/common'
 const OX_ADDRESS = "0x0000000000000000000000000000000000000000"
 const klaytnSrvc = new klaytnGraph.commons.klaytnService(String(process.env.NETWORK_URL));
