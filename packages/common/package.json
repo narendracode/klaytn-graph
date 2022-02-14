@@ -1,6 +1,6 @@
 {
   "name": "@klaytn-graph/common",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/index.js",
   "unpkg": "dist/index.js",
   "jsdelivr": "dist/index.js",
@@ -19,6 +19,7 @@
     "@types/bignumber.js": "^5.0.0",
     "@types/debug": "^4.1.7",
     "bignumber.js": "^9.0.2",
+    "caver-js": "^1.6.8-rc.2",
     "debug": "^4.3.3",
     "dotenv": "^14.3.2",
     "knex": "^1.0.1",

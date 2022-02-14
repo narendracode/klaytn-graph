@@ -1,5 +1,4 @@
 import Caver from 'caver-js';
-import BigNumber from 'bignumber.js';
 
 export class BlockchainService {
     private caver: Caver;

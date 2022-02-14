@@ -66,6 +66,11 @@
   dependencies:
     regenerator-runtime "^0.12.0"
 
+"@colors/colors@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
+  integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
+
 "@commitlint/cli@^16.1.0":
   version "16.1.0"
   resolved "https://registry.yarnpkg.com/@commitlint/cli/-/cli-16.1.0.tgz#022ad86008374b02974c9f3faf86affb785f4574"
@@ -2029,6 +2034,13 @@
     "@types/mime" "^1"
     "@types/node" "*"
 
+"@types/winston@^2.4.4":
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/@types/winston/-/winston-2.4.4.tgz#48cc744b7b42fad74b9a2e8490e0112bd9a3d08d"
+  integrity sha512-BVGCztsypW8EYwJ+Hq+QNYiT/MUyCif0ouBH+flrY66O5W+KIXAMML6E/0fJpm7VjIzgangahl5S03bJJQGrZw==
+  dependencies:
+    winston "*"
+
 "@ungap/promise-all-settled@1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@ungap/promise-all-settled/-/promise-all-settled-1.1.2.tgz#aa58042711d6e3275dd37dc597e5d31e8c290a44"
@@ -2366,6 +2378,32 @@ apollo-server-core@^3.6.2:
     sha.js "^2.4.11"
     uuid "^8.0.0"
 
+apollo-server-core@^3.6.3:
+  version "3.6.3"
+  resolved "https://registry.yarnpkg.com/apollo-server-core/-/apollo-server-core-3.6.3.tgz#6b12ffa1af8bc8799930f72360090834915033d1"
+  integrity sha512-TFJmAlI6vPp1MHOSXqYkE6leAyMekWv/D/3ma11uETkcd3EPjERGmxtTXPJElMVEkOK9BEElYKthCrH7bjYLuw==
+  dependencies:
+    "@apollographql/apollo-tools" "^0.5.1"
+    "@apollographql/graphql-playground-html" "1.6.29"
+    "@graphql-tools/mock" "^8.1.2"
+    "@graphql-tools/schema" "^8.0.0"
+    "@josephg/resolvable" "^1.0.0"
+    apollo-datasource "^3.3.1"
+    apollo-reporting-protobuf "^3.3.0"
+    apollo-server-caching "^3.3.0"
+    apollo-server-env "^4.2.1"
+    apollo-server-errors "^3.3.1"
+    apollo-server-plugin-base "^3.5.1"
+    apollo-server-types "^3.5.1"
+    async-retry "^1.2.1"
+    fast-json-stable-stringify "^2.1.0"
+    graphql-tag "^2.11.0"
+    lodash.sortby "^4.7.0"
+    loglevel "^1.6.8"
+    lru-cache "^6.0.0"
+    sha.js "^2.4.11"
+    uuid "^8.0.0"
+
 apollo-server-env@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/apollo-server-env/-/apollo-server-env-4.2.1.tgz#ea5b1944accdbdba311f179e4dfaeca482c20185"
@@ -2390,6 +2428,23 @@ apollo-server-express@^3.6.2:
     "@types/express-serve-static-core" "4.17.28"
     accepts "^1.3.5"
     apollo-server-core "^3.6.2"
+    apollo-server-types "^3.5.1"
+    body-parser "^1.19.0"
+    cors "^2.8.5"
+    parseurl "^1.3.3"
+
+apollo-server-express@^3.6.3:
+  version "3.6.3"
+  resolved "https://registry.yarnpkg.com/apollo-server-express/-/apollo-server-express-3.6.3.tgz#5daf58bf0bdf0107ded7cd52c7e6ce6cd32c8b44"
+  integrity sha512-3CjahZ+n+1T7pHH1qW1B6Ns0BzwOMeupAp2u0+M8ruOmE/e7VKn0OSOQQckZ8Z2AcWxWeno9K89fIv3PoSYgYA==
+  dependencies:
+    "@types/accepts" "^1.3.5"
+    "@types/body-parser" "1.19.2"
+    "@types/cors" "2.8.12"
+    "@types/express" "4.17.13"
+    "@types/express-serve-static-core" "4.17.28"
+    accepts "^1.3.5"
+    apollo-server-core "^3.6.3"
     apollo-server-types "^3.5.1"
     body-parser "^1.19.0"
     cors "^2.8.5"
@@ -2882,6 +2937,47 @@ caver-js@^1.6.8-rc.1:
   version "1.6.8-rc.1"
   resolved "https://registry.yarnpkg.com/caver-js/-/caver-js-1.6.8-rc.1.tgz#04bc66f12e239ca6aef5256a5e5bd421604c8d98"
   integrity sha512-Vke8cb3Dfj071GVJh1BMIrHYORBKEyZlbdhB8uiP45+7OGd0bButa3l9slK1rZVjThjpTurPNdWSRXE+0HfRYg==
+  dependencies:
+    "@babel/runtime" "7.3.1"
+    "@ethersproject/abi" "5.0.7"
+    any-promise "1.3.0"
+    bignumber.js "8.0.2"
+    bn.js "4.11.6"
+    chai "4.1.2"
+    crypto-browserify "^3.12.0"
+    docdash "^1.2.0"
+    dotenv "8.2.0"
+    elliptic "6.5.4"
+    eth-lib "0.2.8"
+    ethers "5.4.1"
+    ethjs-unit "0.1.6"
+    eventemitter3 "4.0.0"
+    http "0.0.1-security"
+    https "^1.0.0"
+    ipfs-http-client-lite "0.3.0"
+    jsdoc "^3.6.7"
+    lodash "4.17.21"
+    mocha "8.3.2"
+    multihashes "4.0.2"
+    node-fetch "2.6.7"
+    number-to-bn "1.7.0"
+    oboe "2.1.3"
+    os "^0.1.2"
+    request "2.88.2"
+    scrypt-js "3.0.1"
+    semver "6.2.0"
+    stream-browserify "^3.0.0"
+    stream-http "^3.2.0"
+    utf8 "2.1.1"
+    uuid "8.3.2"
+    webpack "^5.65.0"
+    websocket "1.0.31"
+    xhr2-cookies "1.1.0"
+
+caver-js@^1.6.8-rc.2:
+  version "1.6.8-rc.2"
+  resolved "https://registry.yarnpkg.com/caver-js/-/caver-js-1.6.8-rc.2.tgz#2f3c337d975884402c137e6ce8a55112532c644f"
+  integrity sha512-k6MyJ0QXZFgypx6CiReHErnyfplqyRHSeLPYCT7gdOXdbGalGIMHeOHPY8pep3RaDzPEC78B/tgqX12Z7rsKOQ==
   dependencies:
     "@babel/runtime" "7.3.1"
     "@ethersproject/abi" "5.0.7"
@@ -5489,6 +5585,17 @@ logform@^2.3.2:
     fecha "^4.2.0"
     ms "^2.1.1"
     safe-stable-stringify "^1.1.0"
+    triple-beam "^1.3.0"
+
+logform@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/logform/-/logform-2.4.0.tgz#131651715a17d50f09c2a2c1a524ff1a4164bcfe"
+  integrity sha512-CPSJw4ftjf517EhXZGGvTHHkYobo7ZCc0kvwUoOYcjfR2UVrI66RHj8MCrfAdEitdmFqbu2BYdYs8FHHZSb6iw==
+  dependencies:
+    "@colors/colors" "1.5.0"
+    fecha "^4.2.0"
+    ms "^2.1.1"
+    safe-stable-stringify "^2.3.1"
     triple-beam "^1.3.0"
 
 loglevel@^1.6.8:
@@ -8471,6 +8578,31 @@ winston-transport@^4.4.0, winston-transport@^4.4.2:
     logform "^2.3.2"
     readable-stream "^3.4.0"
     triple-beam "^1.2.0"
+
+winston-transport@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/winston-transport/-/winston-transport-4.5.0.tgz#6e7b0dd04d393171ed5e4e4905db265f7ab384fa"
+  integrity sha512-YpZzcUzBedhlTAfJg6vJDlyEai/IFMIVcaEZZyl3UXIl4gmqRpU7AE89AHLkbzLUsv0NVmw7ts+iztqKxxPW1Q==
+  dependencies:
+    logform "^2.3.2"
+    readable-stream "^3.6.0"
+    triple-beam "^1.3.0"
+
+winston@*:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/winston/-/winston-3.6.0.tgz#be32587a099a292b88c49fac6fa529d478d93fb6"
+  integrity sha512-9j8T75p+bcN6D00sF/zjFVmPp+t8KMPB1MzbbzYjeN9VWxdsYnTB40TkbNUEXAmILEfChMvAMgidlX64OG3p6w==
+  dependencies:
+    "@dabh/diagnostics" "^2.0.2"
+    async "^3.2.3"
+    is-stream "^2.0.0"
+    logform "^2.4.0"
+    one-time "^1.0.0"
+    readable-stream "^3.4.0"
+    safe-stable-stringify "^2.3.1"
+    stack-trace "0.0.x"
+    triple-beam "^1.3.0"
+    winston-transport "^4.5.0"
 
 winston@^3.5.0:
   version "3.5.0"

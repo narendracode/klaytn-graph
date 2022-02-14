@@ -10,3 +10,15 @@ services:
       DB_NAME: indexerdb
       DB_USERNAME: root
       DB_PASSWORD: rootpassword
+  graph_api_server:
+    build: ./packages/api
+    environment:
+      NETWORK_URL: https://api.baobab.klaytn.net:8651/
+      PORT: 5000
+      DB_HOST: host.docker.internal
+      DB_PORT: 5432
+      DB_NAME: indexerdb
+      DB_USERNAME: root
+      DB_PASSWORD: rootpassword
+    ports:
+      - "5000:5000"
