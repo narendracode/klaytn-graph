@@ -1,7 +1,5 @@
 import * as klaytnGraph from '@klaytn-graph/common'
-import { SearchNFTDto, CreateNFTDto } from '@klaytn-graph/common/src/dtos/nft.dto';
-import { SearchFTDto } from '@klaytn-graph/common/src/dtos/ft.dto';
-import { CreateContractDto, SearchContractDto } from '@klaytn-graph/common/src/dtos/contract.dto';
+import { SearchNFTDto, CreateNFTDto, SearchFTDto, CreateContractDto, SearchContractDto } from '@klaytn-graph/common';
 
 export const resolvers = {
     Query: {

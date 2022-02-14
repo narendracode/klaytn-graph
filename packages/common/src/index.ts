@@ -4,6 +4,10 @@ import NftDao from './daos/NFTDao'
 import ContractDao from './daos/ContractDao'
 import GlobalDao from './daos/GlobalDao'
 import FtDao from './daos/FTDao'
+import { ContractType, CreateContractDto, SearchContractDto } from './dtos/contract.dto'
+import { SearchNFTDto, CreateNFTDto } from './dtos/nft.dto';
+import { SearchFTDto } from './dtos/ft.dto';
+
 
 const connectionConfig = {
     client: 'pg',
@@ -22,6 +26,9 @@ const contractDao = new ContractDao()
 const globalDao = new GlobalDao()
 const ftDao = new FtDao()
 export { dbService }; // exporting raw database connection object.
+export { ContractType, CreateContractDto, SearchContractDto }
+export { SearchNFTDto, CreateNFTDto }
+export { SearchFTDto }
 export const commons = {
     klaytnService: BlockchainService,
     nftService: nftDao,

@@ -16,7 +16,7 @@
     "start:dev": "nodemon src/index.ts"
   },
   "dependencies": {
-    "@klaytn-graph/common": "^1.0.0",
+    "@klaytn-graph/common": "^1.0.1",
     "@types/debug": "^4.1.7",
     "apollo-server": "^3.6.2",
     "cors": "^2.8.5",

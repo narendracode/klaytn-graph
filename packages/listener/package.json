@@ -16,7 +16,7 @@
     "start:dev": "nodemon src/index.ts"
   },
   "dependencies": {
-    "@klaytn-graph/common": "^1.0.0",
+    "@klaytn-graph/common": "^1.0.2",
     "@types/debug": "^4.1.7",
     "caver-js": "^1.6.8-rc.1",
     "debug": "^4.3.3",
