@@ -41,6 +41,19 @@ cd packages/listener
 yarn start:dev
 ```
 
+### To run project in using docker compose
+```
+docker-compose up
+```
+press CTRL + C to stop the process
+
+### clear the docker network and volumes
+```
+docker-compose down
+```
+> Make sure you have postgres running and you have setup up the db in postgres using knex migration and seed
+
+
 ### To access graphql playgroud
 ```
 http://localhost:5000/graphql
@@ -113,9 +126,6 @@ query{
 # Open for contribution
 
 ## To do : 
-1. Add docker, docker-compose files
-2. Add files for kubernetes deployment
-3. Improve logging
-4. Code refactoring
-5. Test scripts
-6. Add support for KP7(Fungible token)
+1. Add files for kubernetes deployment
+2. Improve logging
+3. Test scripts
